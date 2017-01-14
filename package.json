@@ -12,6 +12,7 @@
   "license": "MIT",
   "repository": "logux/logux-sync",
   "dependencies": {
+    "is_js": "^0.9.0",
     "nanoevents": "^0.3.0",
     "object-assign": "^4.1.0"
   },
