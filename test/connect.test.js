@@ -114,8 +114,42 @@ it('checks param types on connect message', function () {
   expect(test.rightSent).toEqual([
     ['error', 'wrong-format', '["connect",[0,1]]'],
     ['error', 'wrong-format', '["connect",[0,1],1,1]'],
-    ['error', 'wrong-format', '["connect",[0,1]],"client","abc"'],
-    ['error', 'wrong-format', '["connect",[0,1]],"client",1,[]']
+    ['error', 'wrong-format', '["connect",[0,1],"client","abc"'],
+    ['error', 'wrong-format', '["connect",[0,1],"client",1,[]']
+  ])
+})
+
+it('checks param types on connected message', function () {
+  var test = createBaseSyncTest()
+  var left = test.leftSync.connection
+  var right = left.other()
+  var protocol = test.leftSync.protocol
+
+  right.connect()
+  right.send(['connect', protocol, 'right', 0])
+  left.send(['connected', protocol, 'left'])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  right.connect()
+  right.send(['connect', protocol, 'right', 0])
+  left.send(['connected', protocol, 1, [0, 0]])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  right.connect()
+  right.send(['connect', protocol, 'right', 0])
+  left.send(['connected', protocol, 'left', [0, 'abc']])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  right.connect()
+  right.send(['connect', protocol, 'right', 0])
+  left.send(['connected', protocol, 'left', [0, 1], 'abc'])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  expect(test.rightSent).toEqual([
+    ['error', 'wrong-format', '["connected",[0,1],"left"]'],
+    ['error', 'wrong-format', '["connect",[0,1],1,[0,0]]'],
+    ['error', 'wrong-format', '["connect",[0,1],"left",[0,"abc"]]'],
+    ['error', 'wrong-format', '["connect",[0,1],"left",[0,1],"abc"]']
   ])
 })
 
