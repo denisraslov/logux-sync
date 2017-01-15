@@ -2,6 +2,7 @@ var createTestTimer = require('logux-core').createTestTimer
 var MemoryStore = require('logux-core').MemoryStore
 var Log = require('logux-core').Log
 
+var BaseSync = require('../base-sync')
 var ClientSync = require('../client-sync')
 var ServerSync = require('../server-sync')
 var LocalPair = require('../local-pair')
@@ -30,6 +31,27 @@ function createTest () {
     clientSent: clientSent,
     server: server,
     client: client
+  }
+}
+
+function createBaseSyncTest () {
+  var log = new Log({ store: new MemoryStore(), timer: createTestTimer() })
+  var pair = new LocalPair()
+  var leftSync = new BaseSync('left', log, pair.left)
+
+  var leftSent = []
+  pair.right.on('message', function (msg) {
+    leftSent.push(msg)
+  })
+  var rightSent = []
+  pair.left.on('message', function (msg) {
+    rightSent.push(msg)
+  })
+
+  return {
+    leftSent: leftSent,
+    rightSent: rightSent,
+    leftSync: leftSync
   }
 }
 
@@ -67,6 +89,34 @@ it('checks protocol version', function () {
     ['error', 'wrong-protocol', { supported: [1], used: [2, 0] }]
   ])
   expect(test.client.connected).toBeFalsy()
+})
+
+it('checks param types on connect message', function () {
+  var test = createBaseSyncTest()
+  var protocol = test.leftSync.protocol
+
+  test.leftSync.connection.connect()
+  test.leftSync.connection.send(['connect', protocol])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  test.leftSync.connection.connect()
+  test.leftSync.connection.send(['connect', protocol, 1, 1])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  test.leftSync.connection.connect()
+  test.leftSync.connection.send(['connect', protocol, 'client', 'abc'])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  test.leftSync.connection.connect()
+  test.leftSync.connection.send(['connect', protocol, 'client', 1, []])
+  expect(test.leftSync.connected).toBeFalsy()
+
+  expect(test.rightSent).toEqual([
+    ['error', 'wrong-format', '["connect",[0,1]]'],
+    ['error', 'wrong-format', '["connect",[0,1],1,1]'],
+    ['error', 'wrong-format', '["connect",[0,1]],"client","abc"'],
+    ['error', 'wrong-format', '["connect",[0,1]],"client",1,[]']
+  ])
 })
 
 it('saves other node name', function () {

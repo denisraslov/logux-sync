@@ -43,7 +43,7 @@ it('sends error on wrong message format', function () {
   ])
 })
 
-it('sends error on wrong params format', function () {
+it('sends error on wrong params format in error message', function () {
   var test = createTest()
 
   test.sync.connection.other().send(['error'])
