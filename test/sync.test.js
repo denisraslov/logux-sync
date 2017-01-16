@@ -64,6 +64,71 @@ it('sends sync messages', function () {
   })
 })
 
+it('check sync param types', function () {
+  var test = createTest()
+  var serverSent = []
+  test.client.connection.on('message', function (msg) {
+    serverSent.push(msg)
+  })
+
+  test.client.connection.send(['sync'])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  test.client.connection.connect()
+  test.client.connection.send(['sync', 'abc'])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  test.client.connection.connect()
+  test.client.connection.send(['sync', 2, {}, []])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  test.client.connection.connect()
+  test.client.connection.send(['sync', 2, {}, 'abc'])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  test.client.connection.connect()
+  test.client.connection.send(['sync', 2, 1, {}])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  expect(serverSent).toEqual([
+    ['error', 'wrong-format', '["sync"]'],
+    ['error', 'wrong-format', '["sync","abc"]'],
+    ['error', 'wrong-format', '["sync",2,{},[]]'],
+    ['error', 'wrong-format', '["sync",2,{},"abc"]'],
+    ['error', 'wrong-format', '["sync",2,1,{}]']
+  ])
+})
+
+it('check synced param types', function () {
+  var test = createTest()
+  var serverSent = []
+  test.client.connection.on('message', function (msg) {
+    serverSent.push(msg)
+  })
+
+  test.client.connection.send(['synced'])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  test.client.connection.connect()
+  test.client.connection.send(['synced', 'abc'])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  test.client.connection.connect()
+  test.client.connection.send(['synced', {}])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  test.client.connection.connect()
+  test.client.connection.send(['sync', []])
+  expect(test.client.connection.connected).toBeFalsy()
+
+  expect(serverSent).toEqual([
+    ['error', 'wrong-format', '["synced"]'],
+    ['error', 'wrong-format', '["synced","abc"]'],
+    ['error', 'wrong-format', '["synced",{}'],
+    ['error', 'wrong-format', '["synced",[]]']
+  ])
+})
+
 it('synchronizes events', function () {
   var test = createTest()
 
