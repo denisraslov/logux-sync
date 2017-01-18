@@ -18,7 +18,7 @@ function initTest (opts) {
   var sync = new ClientSync('client', log, pair.left, opts)
 
   sync.connection.connect()
-  sync.connection.other().send(['connected', sync.protocol, 'server'])
+  sync.connection.other().send(['connected', sync.protocol, 'server', [0, 0]])
 
   var sent = []
   sync.connection.other().on('message', function (msg) {
@@ -93,21 +93,18 @@ it('checks ping synced type', function () {
   var test = initTest({ fixTime: false })
 
   test.right.send(['ping'])
-  expect(test.right.connection.connected).toBeFalsy()
+  expect(test.right.connected).toBeFalsy()
+  expect(test.sent).toEqual([['error', 'wrong-format', '["ping",null]']])
 
-  test.sync.connection.connect()
+  test = initTest({ fixTime: false })
   test.right.send(['ping', 'abc'])
-  expect(test.right.connection.connected).toBeFalsy()
+  expect(test.right.connected).toBeFalsy()
+  expect(test.sent).toEqual([['error', 'wrong-format', '["ping","abc"]']])
 
-  test.sync.connection.connect()
+  test = initTest({ fixTime: false })
   test.right.send(['ping', []])
-  expect(test.right.connection.connected).toBeFalsy()
-
-  expect(test.sent).toEqual([
-    ['error', 'wrong-format', '["ping"]'],
-    ['error', 'wrong-format', '["ping","abc"]'],
-    ['error', 'wrong-format', '["ping",[]]']
-  ])
+  expect(test.right.connected).toBeFalsy()
+  expect(test.sent).toEqual([['error', 'wrong-format', '["ping",[]]']])
 })
 
 it('checks pong synced type', function () {
@@ -115,18 +112,15 @@ it('checks pong synced type', function () {
 
   test.right.send(['pong'])
   expect(test.right.connected).toBeFalsy()
+  expect(test.sent).toEqual([['error', 'wrong-format', '["pong",null]']])
 
-  test.sync.connection.connect()
+  test = initTest({ fixTime: false })
   test.right.send(['pong', 'abc'])
   expect(test.right.connected).toBeFalsy()
+  expect(test.sent).toEqual([['error', 'wrong-format', '["pong","abc"]']])
 
-  test.sync.connection.connect()
+  test = initTest({ fixTime: false })
   test.right.send(['pong', {}])
   expect(test.right.connected).toBeFalsy()
-
-  expect(test.sent).toEqual([
-    ['error', 'wrong-format', '["pong"]'],
-    ['error', 'wrong-format', '["pong","abc"]'],
-    ['error', 'wrong-format', '["pong",{}']
-  ])
+  expect(test.sent).toEqual([['error', 'wrong-format', '["pong",{}]']])
 })

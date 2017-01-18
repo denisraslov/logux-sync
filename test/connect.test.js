@@ -94,28 +94,29 @@ it('checks protocol version', function () {
 it('checks param types on connect message', function () {
   var test = createBaseSyncTest()
   var protocol = test.leftSync.protocol
+  var right = test.leftSync.connection.other()
 
-  test.leftSync.connection.connect()
-  test.leftSync.connection.send(['connect', protocol])
-  expect(test.leftSync.connected).toBeFalsy()
+  right.connect()
+  right.send(['connect', protocol])
+  expect(right.connected).toBeFalsy()
 
-  test.leftSync.connection.connect()
-  test.leftSync.connection.send(['connect', protocol, 1, 1])
-  expect(test.leftSync.connected).toBeFalsy()
+  right.connect()
+  right.send(['connect', protocol, 1, 1])
+  expect(right.connected).toBeFalsy()
 
-  test.leftSync.connection.connect()
-  test.leftSync.connection.send(['connect', protocol, 'client', 'abc'])
-  expect(test.leftSync.connected).toBeFalsy()
+  right.connect()
+  right.send(['connect', protocol, 'client', 'abc'])
+  expect(right.connected).toBeFalsy()
 
-  test.leftSync.connection.connect()
-  test.leftSync.connection.send(['connect', protocol, 'client', 1, []])
-  expect(test.leftSync.connected).toBeFalsy()
+  right.connect()
+  right.send(['connect', protocol, 'client', 1, []])
+  expect(right.connected).toBeFalsy()
 
-  expect(test.rightSent).toEqual([
-    ['error', 'wrong-format', '["connect",[0,1]]'],
-    ['error', 'wrong-format', '["connect",[0,1],1,1]'],
-    ['error', 'wrong-format', '["connect",[0,1],"client","abc"'],
-    ['error', 'wrong-format', '["connect",[0,1],"client",1,[]']
+  expect(test.leftSent).toEqual([
+    ['error', 'wrong-format', '["connect",[0,1],null,null,null]'],
+    ['error', 'wrong-format', '["connect",[0,1],1,1,null]'],
+    ['error', 'wrong-format', '["connect",[0,1],"client","abc",null]'],
+    ['error', 'wrong-format', '["connect",[0,1],"client",1,[]]']
   ])
 })
 
@@ -125,31 +126,35 @@ it('checks param types on connected message', function () {
   var right = left.other()
   var protocol = test.leftSync.protocol
 
-  right.connect()
-  right.send(['connect', protocol, 'right', 0])
-  left.send(['connected', protocol, 'left'])
-  expect(test.leftSync.connected).toBeFalsy()
+  left.connect()
+  left.send(['connect', protocol, 'left', 0])
+  right.send(['connected', protocol, 'right'])
+  expect(right.connected).toBeFalsy()
 
-  right.connect()
-  right.send(['connect', protocol, 'right', 0])
-  left.send(['connected', protocol, 1, [0, 0]])
-  expect(test.leftSync.connected).toBeFalsy()
+  left.connect()
+  left.send(['connect', protocol, 'left', 0])
+  right.send(['connected', protocol, 1, [0, 0]])
+  expect(right.connected).toBeFalsy()
 
-  right.connect()
-  right.send(['connect', protocol, 'right', 0])
-  left.send(['connected', protocol, 'left', [0, 'abc']])
-  expect(test.leftSync.connected).toBeFalsy()
+  left.connect()
+  left.send(['connect', protocol, 'left', 0])
+  right.send(['connected', protocol, 'right', [0, 'abc']])
+  expect(right.connected).toBeFalsy()
 
-  right.connect()
-  right.send(['connect', protocol, 'right', 0])
-  left.send(['connected', protocol, 'left', [0, 1], 'abc'])
-  expect(test.leftSync.connected).toBeFalsy()
+  left.connect()
+  left.send(['connect', protocol, 'left', 0])
+  right.send(['connected', protocol, 'right', [0, 1], 'abc'])
+  expect(right.connected).toBeFalsy()
 
-  expect(test.rightSent).toEqual([
-    ['error', 'wrong-format', '["connected",[0,1],"left"]'],
-    ['error', 'wrong-format', '["connect",[0,1],1,[0,0]]'],
-    ['error', 'wrong-format', '["connect",[0,1],"left",[0,"abc"]]'],
-    ['error', 'wrong-format', '["connect",[0,1],"left",[0,1],"abc"]']
+  expect(test.leftSent).toEqual([
+    ['connect', protocol, 'left', 0],
+    ['error', 'wrong-format', '["connected",[0,1],"right",null,null]'],
+    ['connect', protocol, 'left', 0],
+    ['error', 'wrong-format', '["connected",[0,1],1,[0,0],null]'],
+    ['connect', protocol, 'left', 0],
+    ['error', 'wrong-format', '["connected",[0,1],"right",[0,"abc"],null]'],
+    ['connect', protocol, 'left', 0],
+    ['error', 'wrong-format', '["connected",[0,1],"right",[0,1],"abc"]']
   ])
 })
 

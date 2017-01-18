@@ -21,7 +21,7 @@ it('saves last added from ping', function () {
   var sync = new ClientSync('client', log, pair.left, { fixTime: false })
 
   pair.left.connect()
-  pair.right.send(['connected', sync.protocol, 'server'])
+  pair.right.send(['connected', sync.protocol, 'server', [0, 0]])
   expect(sync.otherSynced).toBe(0)
 
   pair.right.send(['ping', 1])
