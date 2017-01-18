@@ -69,45 +69,61 @@ it('sends sync messages', function () {
 it('check sync param types', function () {
   var test = createTest()
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['sync'])
   }).toThrow(new SyncError(test.client, 'wrong-format', '["sync"]', true))
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['sync', 'abc'])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["sync","abc"]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["sync","abc"]', true)
+  )
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['sync', 2, {}, 1])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["sync",2,{},1]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["sync",2,{},1]', true)
+  )
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['sync', 2, {}, 'abc'])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["sync",2,{},"abc"]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["sync",2,{},"abc"]', true)
+  )
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['sync', 2, 1, {}])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["sync",2,1,{}]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["sync",2,1,{}]', true)
+  )
 })
 
 it('check synced param types', function () {
   var test = createTest()
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['synced'])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["synced",null]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["synced",null]', true)
+  )
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['synced', 'abc'])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["synced","abc"]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["synced","abc"]', true)
+  )
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['synced', {}])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["synced",{}]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["synced",{}]', true)
+  )
 
-  expect(function() {
+  expect(function () {
     test.client.connection.send(['synced', []])
-  }).toThrow(new SyncError(test.client, 'wrong-format', '["synced",[]]', true))
+  }).toThrow(
+    new SyncError(test.client, 'wrong-format', '["synced",[]]', true)
+  )
 })
 
 it('synchronizes events', function () {

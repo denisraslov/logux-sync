@@ -1,3 +1,4 @@
+var TypeChecker = require('../type-checker')
 var SyncError = require('../sync-error')
 
 function auth (sync, nodeId, credentials, callback) {
@@ -75,6 +76,17 @@ module.exports = {
   },
 
   connectMessage: function connectMessage (ver, nodeId, synced, options) {
+    var isTypesValid = TypeChecker.checkType(nodeId, 'string', true) &&
+      TypeChecker.checkType(synced, 'number', true) &&
+      TypeChecker.checkType(options, 'object', false)
+
+    if (!isTypesValid) {
+      var msg = JSON.stringify(['connect', ver, nodeId, synced, options])
+      this.sendError(new SyncError(this, 'wrong-format', msg))
+      this.connection.disconnect()
+      return
+    }
+
     var start = this.log.timer()[0]
     if (!options) options = { }
 
@@ -105,6 +117,19 @@ module.exports = {
   },
 
   connectedMessage: function connectedMessage (ver, nodeId, time, options) {
+    var isTypesValid = TypeChecker.checkType(nodeId, 'string', true) &&
+      TypeChecker.checkType(time, 'array', true) && time.length === 2 &&
+      TypeChecker.checkType(time[0], 'number', true) &&
+      TypeChecker.checkType(time[1], 'number', true) &&
+      TypeChecker.checkType(options, 'object', false)
+
+    if (!isTypesValid) {
+      var msg = JSON.stringify(['connected', ver, nodeId, time, options])
+      this.sendError(new SyncError(this, 'wrong-format', msg))
+      this.connection.disconnect()
+      return
+    }
+
     if (!options) options = { }
 
     this.endTimeout()
