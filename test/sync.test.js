@@ -133,7 +133,7 @@ it('check synced param types', function () {
   test.client.connection.send(['synced'])
   expect(test.server.connection.connected).toBeFalsy()
   expect(test.serverSent).toEqual(
-    [['error', 'wrong-format', '["synced",null]']]
+    [['error', 'wrong-format', '["synced"]']]
   )
 
   test = createTest()
@@ -141,7 +141,7 @@ it('check synced param types', function () {
   test.client.connection.send(['synced'])
   expect(test.server.connection.connected).toBeFalsy()
   expect(test.serverSent).toEqual(
-    [['error', 'wrong-format', '["synced",null]']]
+    [['error', 'wrong-format', '["synced"]']]
   )
 
   test = createTest()

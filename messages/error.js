@@ -9,11 +9,6 @@ module.exports = {
   },
 
   errorMessage: function errorMessage (type, options) {
-    if (!this.validateError(type, options)) {
-      this.wrongFormatError(['error', type, options])
-      return
-    }
-
     this.error(type, options, true)
   }
 

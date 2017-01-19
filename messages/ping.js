@@ -7,21 +7,11 @@ module.exports = {
   },
 
   pingMessage: function pingMessage (synced) {
-    if (!this.validatePing(synced)) {
-      this.wrongFormatError(['ping', synced])
-      return
-    }
-
     this.setOtherSynced(synced)
     this.send(['pong', this.log.lastAdded])
   },
 
   pongMessage: function pongMessage (synced) {
-    if (!this.validatePong(synced)) {
-      this.wrongFormatError(['pong', synced])
-      return
-    }
-
     this.setOtherSynced(synced)
     this.endTimeout()
   }

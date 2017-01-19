@@ -58,9 +58,9 @@ it('sends error on wrong error param types', function () {
   expect(test.sync.connection.connected).toBeFalsy()
 
   expect(test.messages).toEqual([
-    ['error', 'wrong-format', '["error",null,null]'],
-    ['error', 'wrong-format', '["error",1,null]'],
-    ['error', 'wrong-format', '["error",{},null]']
+    ['error', 'wrong-format', '["error"]'],
+    ['error', 'wrong-format', '["error",1]'],
+    ['error', 'wrong-format', '["error",{}]']
   ])
 })
 

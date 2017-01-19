@@ -75,13 +75,6 @@ module.exports = {
   },
 
   connectMessage: function connectMessage (ver, nodeId, synced, options) {
-    var isValid = this.validateConnect(ver, nodeId, synced, options)
-
-    if (!isValid) {
-      this.wrongFormatError(['connect', ver, nodeId, synced, options])
-      return
-    }
-
     var start = this.log.timer()[0]
     if (!options) options = { }
 
@@ -112,13 +105,6 @@ module.exports = {
   },
 
   connectedMessage: function connectedMessage (ver, nodeId, time, options) {
-    var isValid = this.validateConnected(ver, nodeId, time, options)
-
-    if (!isValid) {
-      this.wrongFormatError(['connected', ver, nodeId, time, options])
-      return
-    }
-
     if (!options) options = { }
 
     this.endTimeout()

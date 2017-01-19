@@ -1,24 +1,84 @@
-var TypeChecker = require('./type-checker')
 var SyncError = require('./sync-error')
 
+var TypeChecker = {
+
+  check: function check (value, type, required) {
+    if (value === undefined) {
+      return !required
+    }
+
+    return this['is' + this.capitalizeFirstLetter(type)](value)
+  },
+
+  capitalizeFirstLetter: function capitalizeFirstLetter (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  },
+
+  isNumber: function isNumber (value) {
+    return typeof value === 'number'
+  },
+  isString: function isString (value) {
+    return typeof value === 'string'
+  },
+  isObject: function isObject (value) {
+    return typeof value === 'object' && typeof value.length !== 'number'
+  },
+  isArray: function isArray (value) {
+    return typeof value === 'object' && typeof value.length === 'number'
+  },
+  isFunction: function isFunction (value) {
+    return typeof value === 'function'
+  }
+}
+
 function checkType (value, type, required) {
-  return TypeChecker.checkType(value, type, required)
+  return TypeChecker.check(value, type, required)
 }
 
 module.exports = {
 
-  validateMessageFormat: function validateMessageFormat (msg) {
-    return checkType(msg, 'array', true) &&
-      checkType(msg[0], 'string', true)
+  validateMessage: function validateMessage (msg) {
+    var name = msg[0]
+    var isValid = checkType(msg, 'array', true) &&
+      checkType(name, 'string', true)
+
+    if (isValid) {
+      var msgMethod = name + 'Message'
+      if (!checkType(this[msgMethod], 'function', true)) {
+        this.sendError(new SyncError(this, 'unknown-message', name))
+        this.connection.disconnect()
+        return false
+      }
+    } else {
+      this.wrongFormatError(msg)
+      return false
+    }
+
+    var validator = this[name + 'Validator']
+    if (!checkType(validator, 'function', true)) {
+      return true
+    }
+
+    var args = new Array(msg.length - 1)
+    for (var i = 1; i < msg.length; i++) {
+      args[i - 1] = msg[i]
+    }
+
+    if (!validator.apply(this, args)) {
+      this.wrongFormatError(msg)
+      return false
+    }
+
+    return true
   },
 
-  validateConnect: function validateConnect (ver, nodeId, synced, options) {
+  connectValidator: function connectValidator (ver, nodeId, synced, options) {
     return checkType(nodeId, 'string', true) &&
       checkType(synced, 'number', true) &&
       checkType(options, 'object', false)
   },
 
-  validateConnected: function validateConnected (ver, nodeId, time, options) {
+  connectedValidator: function connectedValidator (ver, nodeId, time, options) {
     return checkType(nodeId, 'string', true) &&
       checkType(time, 'array', true) && time.length === 2 &&
       checkType(time[0], 'number', true) &&
@@ -26,15 +86,15 @@ module.exports = {
       checkType(options, 'object', false)
   },
 
-  validatePing: function validatePing (synced) {
+  pingValidator: function pingValidator (synced) {
     return checkType(synced, 'number', true)
   },
 
-  validatePong: function validatePong (synced) {
+  pongValidator: function pongValidator (synced) {
     return checkType(synced, 'number', true)
   },
 
-  validateSync: function validateSync (added) {
+  syncValidator: function syncValidator (added) {
     if (!checkType(added, 'number', true)) {
       return false
     }
@@ -53,11 +113,11 @@ module.exports = {
     return true
   },
 
-  validateSynced: function validateSynced (synced) {
+  syncedValidator: function syncedValidator (synced) {
     return checkType(synced, 'number', true)
   },
 
-  validateError: function validateError (type) {
+  errorValidator: function errorValidator (type) {
     return checkType(type, 'string', true)
   },
 

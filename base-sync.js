@@ -351,18 +351,12 @@ BaseSync.prototype = {
   onMessage: function onMessage (msg) {
     this.delayPing()
 
-    if (!this.validateMessageFormat(msg)) {
-      this.wrongFormatError(msg)
+    if (!this.validateMessage(msg)) {
       return
     }
 
     var name = msg[0]
     var method = name + 'Message'
-    if (typeof this[method] !== 'function') {
-      this.sendError(new SyncError(this, 'unknown-message', name))
-      this.connection.disconnect()
-      return
-    }
 
     if (!this.authenticated && BEFORE_AUTH.indexOf(name) === -1) {
       if (this.authenticating) {

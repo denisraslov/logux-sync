@@ -30,12 +30,6 @@ module.exports = {
     var sync = this
     var promises = []
 
-    if (!this.validateSync.apply(this, arguments)) {
-      var msg = ['sync'].concat(Array.prototype.slice.call(arguments))
-      this.wrongFormatError(msg)
-      return
-    }
-
     for (var i = 1; i < arguments.length - 1; i += 2) {
       var event = arguments[i]
       var meta = { created: arguments[i + 1] }
@@ -79,11 +73,6 @@ module.exports = {
   },
 
   syncedMessage: function syncedMessage (synced) {
-    if (!this.validateSynced(synced)) {
-      this.wrongFormatError(['synced', synced])
-      return
-    }
-
     this.setSynced(synced)
     if (this.syncing > 0) this.syncing -= 1
     if (this.syncing === 0) {

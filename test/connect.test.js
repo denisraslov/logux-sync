@@ -113,9 +113,9 @@ it('checks param types on connect message', function () {
   expect(right.connected).toBeFalsy()
 
   expect(test.leftSent).toEqual([
-    ['error', 'wrong-format', '["connect",[0,1],null,null,null]'],
-    ['error', 'wrong-format', '["connect",[0,1],1,1,null]'],
-    ['error', 'wrong-format', '["connect",[0,1],"client","abc",null]'],
+    ['error', 'wrong-format', '["connect",[0,1]]'],
+    ['error', 'wrong-format', '["connect",[0,1],1,1]'],
+    ['error', 'wrong-format', '["connect",[0,1],"client","abc"]'],
     ['error', 'wrong-format', '["connect",[0,1],"client",1,[]]']
   ])
 })
@@ -148,11 +148,11 @@ it('checks param types on connected message', function () {
 
   expect(test.leftSent).toEqual([
     ['connect', protocol, 'left', 0],
-    ['error', 'wrong-format', '["connected",[0,1],"right",null,null]'],
+    ['error', 'wrong-format', '["connected",[0,1],"right"]'],
     ['connect', protocol, 'left', 0],
-    ['error', 'wrong-format', '["connected",[0,1],1,[0,0],null]'],
+    ['error', 'wrong-format', '["connected",[0,1],1,[0,0]]'],
     ['connect', protocol, 'left', 0],
-    ['error', 'wrong-format', '["connected",[0,1],"right",[0,"abc"],null]'],
+    ['error', 'wrong-format', '["connected",[0,1],"right",[0,"abc"]]'],
     ['connect', protocol, 'left', 0],
     ['error', 'wrong-format', '["connected",[0,1],"right",[0,1],"abc"]']
   ])

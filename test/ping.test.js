@@ -94,7 +94,7 @@ it('checks ping synced type', function () {
 
   test.right.send(['ping'])
   expect(test.right.connected).toBeFalsy()
-  expect(test.sent).toEqual([['error', 'wrong-format', '["ping",null]']])
+  expect(test.sent).toEqual([['error', 'wrong-format', '["ping"]']])
 
   test = initTest({ fixTime: false })
   test.right.send(['ping', 'abc'])
@@ -112,7 +112,7 @@ it('checks pong synced type', function () {
 
   test.right.send(['pong'])
   expect(test.right.connected).toBeFalsy()
-  expect(test.sent).toEqual([['error', 'wrong-format', '["pong",null]']])
+  expect(test.sent).toEqual([['error', 'wrong-format', '["pong"]']])
 
   test = initTest({ fixTime: false })
   test.right.send(['pong', 'abc'])
