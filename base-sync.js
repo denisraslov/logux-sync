@@ -1,14 +1,14 @@
 var NanoEvents = require('nanoevents')
 var assign = require('object-assign')
 
-var TypeChecker = require('./type-checker')
-
 var SyncError = require('./sync-error')
 
 var connectMessages = require('./messages/connect')
 var errorMessages = require('./messages/error')
 var pingMessages = require('./messages/ping')
 var syncMessages = require('./messages/sync')
+
+var validator = require('./validator')
 
 var BEFORE_AUTH = ['connect', 'connected', 'error']
 
@@ -351,10 +351,8 @@ BaseSync.prototype = {
   onMessage: function onMessage (msg) {
     this.delayPing()
 
-    if (!TypeChecker.checkType(msg, 'array', true) ||
-        !TypeChecker.checkType(msg[0], 'string', true)) {
-      this.sendError(new SyncError(this, 'wrong-format', JSON.stringify(msg)))
-      this.connection.disconnect()
+    if (!this.validateMessageFormat(msg)) {
+      this.wrongFormatError(msg)
       return
     }
 
@@ -478,7 +476,7 @@ BaseSync.prototype = {
 }
 
 BaseSync.prototype = assign(BaseSync.prototype,
-  errorMessages, connectMessages, pingMessages, syncMessages)
+  errorMessages, connectMessages, pingMessages, syncMessages, validator)
 
 module.exports = BaseSync
 

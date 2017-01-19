@@ -1,6 +1,3 @@
-var TypeChecker = require('../type-checker')
-var SyncError = require('../sync-error')
-
 function fixTime (created, fix) {
   return [created[0] + fix].concat(created.slice(1))
 }
@@ -29,33 +26,13 @@ module.exports = {
     this.send(['synced', added])
   },
 
-  validateSync: function validateSync (added) {
-    if (!TypeChecker.checkType(added, 'number', true)) {
-      return false
-    }
-
-    if (arguments.length % 2 !== 1) {
-      return false
-    }
-
-    for (var i = 1; i < arguments.length; i++) {
-      var type = (i % 2 === 0 ? 'array' : 'object')
-      if (!TypeChecker.checkType(arguments[i], type, true)) {
-        return false
-      }
-    }
-
-    return true
-  },
-
   syncMessage: function syncMessage (added) {
     var sync = this
     var promises = []
 
     if (!this.validateSync.apply(this, arguments)) {
       var msg = ['sync'].concat(Array.prototype.slice.call(arguments))
-      this.sendError(new SyncError(this, 'wrong-format', JSON.stringify(msg)))
-      this.connection.disconnect()
+      this.wrongFormatError(msg)
       return
     }
 
@@ -101,16 +78,9 @@ module.exports = {
     })
   },
 
-  validateSynced: function validateSynced (synced) {
-    return TypeChecker.checkType(synced, 'number', true)
-  },
-
   syncedMessage: function syncedMessage (synced) {
     if (!this.validateSynced(synced)) {
-      this.sendError(
-        new SyncError(this, 'wrong-format', JSON.stringify(['synced', synced]))
-      )
-      this.connection.disconnect()
+      this.wrongFormatError(['synced', synced])
       return
     }
 
