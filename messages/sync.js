@@ -34,6 +34,10 @@ module.exports = {
       return false
     }
 
+    if (arguments.length % 2 !== 1) {
+      return false
+    }
+
     for (var i = 1; i < arguments.length; i++) {
       var type = (i % 2 === 0 ? 'array' : 'object')
       if (!TypeChecker.checkType(arguments[i], type, true)) {
