@@ -1,6 +1,8 @@
 var NanoEvents = require('nanoevents')
 var assign = require('object-assign')
 
+var TypeChecker = require('./type-checker')
+
 var SyncError = require('./sync-error')
 
 var connectMessages = require('./messages/connect')
@@ -349,8 +351,8 @@ BaseSync.prototype = {
   onMessage: function onMessage (msg) {
     this.delayPing()
 
-    if (typeof msg !== 'object' || typeof msg.length !== 'number' ||
-        typeof msg[0] !== 'string') {
+    if (!TypeChecker.checkType(msg, 'array', true) ||
+        !TypeChecker.checkType(msg[0], 'string', true)) {
       this.sendError(new SyncError(this, 'wrong-format', JSON.stringify(msg)))
       this.connection.disconnect()
       return
