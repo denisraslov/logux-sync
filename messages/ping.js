@@ -9,8 +9,12 @@ module.exports = {
     if (this.pingTimeout) clearTimeout(this.pingTimeout)
   },
 
+  validatePing: function validatePing (synced) {
+    return TypeChecker.checkType(synced, 'number', true)
+  },
+
   pingMessage: function pingMessage (synced) {
-    if (!TypeChecker.checkType(synced, 'number', true)) {
+    if (!this.validatePing(synced)) {
       this.sendError(
         new SyncError(this, 'wrong-format', JSON.stringify(['ping', synced]))
       )
@@ -22,8 +26,12 @@ module.exports = {
     this.send(['pong', this.log.lastAdded])
   },
 
+  validatePong: function validatePong (synced) {
+    return TypeChecker.checkType(synced, 'number', true)
+  },
+
   pongMessage: function pongMessage (synced) {
-    if (!TypeChecker.checkType(synced, 'number', true)) {
+    if (!this.validatePong(synced)) {
       this.sendError(
         new SyncError(this, 'wrong-format', JSON.stringify(['pong', synced]))
       )

@@ -29,7 +29,7 @@ module.exports = {
     this.send(['synced', added])
   },
 
-  checkSyncParams: function checkSyncParams (added) {
+  validateSync: function validateSync (added) {
     if (!TypeChecker.checkType(added, 'number', true)) {
       return false
     }
@@ -48,7 +48,7 @@ module.exports = {
     var sync = this
     var promises = []
 
-    if (!this.checkSyncParams.apply(this, arguments)) {
+    if (!this.validateSync.apply(this, arguments)) {
       var msg = ['sync'].concat(Array.prototype.slice.call(arguments))
       this.sendError(new SyncError(this, 'wrong-format', JSON.stringify(msg)))
       this.connection.disconnect()
@@ -97,8 +97,12 @@ module.exports = {
     })
   },
 
+  validateSynced: function validateSynced (synced) {
+    return TypeChecker.checkType(synced, 'number', true)
+  },
+
   syncedMessage: function syncedMessage (synced) {
-    if (!TypeChecker.checkType(synced, 'number', true)) {
+    if (!this.validateSynced(synced)) {
       this.sendError(
         new SyncError(this, 'wrong-format', JSON.stringify(['synced', synced]))
       )
